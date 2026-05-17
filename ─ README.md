@@ -1,19 +1,31 @@
-# Login Registration System in C++
+# Sudoku Solver in C++
+
+This project solves a Sudoku puzzle using the Backtracking Algorithm.
 
 ## Features
-- User Registration
-- User Login
-- Duplicate Username Checking
-- File Handling
-- Input Validation
 
-## Technologies Used
-- C++
-- File Handling
+- 2D Array Representation
+- Backtracking Technique
+- Sudoku Rule Checking
+- Recursive Solution
 
 ## How to Run
 
-Compile:
+### Compile
 
 ```bash
-g++ login_system.cpp -o login_system
+g++ main.cpp -o sudoku
+```
+
+### Run
+
+```bash
+./sudoku
+```
+
+## Concepts Used
+
+- Arrays
+- Functions
+- Recursion
+- Backtracking Algorithm
