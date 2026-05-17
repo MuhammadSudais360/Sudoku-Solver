@@ -1,0 +1,9 @@
+
+---
+
+### `.gitignore`
+Optional file hai. Temporary files ignore karne ke liye.
+
+```text
+*.exe
+*.o
