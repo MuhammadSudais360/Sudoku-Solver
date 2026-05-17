@@ -1,129 +1,117 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-
 using namespace std;
 
-// Check if username already exists
-bool userExists(const string &username)
-{
-    ifstream file("users.txt");
-    string user, pass;
+const int SIZE = 9;
 
-    while (file >> user >> pass)
-    {
-        if (user == username)
-        {
-            file.close();
-            return true;
+// Function to print the Sudoku grid
+void printGrid(int grid[SIZE][SIZE]) {
+    for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+            cout << grid[row][col] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Check if a number exists in the row
+bool isRowSafe(int grid[SIZE][SIZE], int row, int num) {
+    for (int col = 0; col < SIZE; col++) {
+        if (grid[row][col] == num)
+            return false;
+    }
+    return true;
+}
+
+// Check if a number exists in the column
+bool isColSafe(int grid[SIZE][SIZE], int col, int num) {
+    for (int row = 0; row < SIZE; row++) {
+        if (grid[row][col] == num)
+            return false;
+    }
+    return true;
+}
+
+// Check if a number exists in the 3x3 subgrid
+bool isBoxSafe(int grid[SIZE][SIZE], int startRow, int startCol, int num) {
+    for (int row = 0; row < 3; row++) {
+        for (int col = 0; col < 3; col++) {
+            if (grid[row + startRow][col + startCol] == num)
+                return false;
         }
     }
+    return true;
+}
 
-    file.close();
+// Check whether placing num is valid
+bool isSafe(int grid[SIZE][SIZE], int row, int col, int num) {
+    return isRowSafe(grid, row, num) &&
+           isColSafe(grid, col, num) &&
+           isBoxSafe(grid, row - row % 3, col - col % 3, num);
+}
+
+// Find an empty location in the grid
+bool findEmptyLocation(int grid[SIZE][SIZE], int &row, int &col) {
+    for (row = 0; row < SIZE; row++) {
+        for (col = 0; col < SIZE; col++) {
+            if (grid[row][col] == 0)
+                return true;
+        }
+    }
     return false;
 }
 
-// Register user
-void registerUser()
-{
-    string username, password;
+// Backtracking function to solve Sudoku
+bool solveSudoku(int grid[SIZE][SIZE]) {
+    int row, col;
 
-    cout << "Enter username: ";
-    cin >> username;
+    // If no empty cell is found, puzzle is solved
+    if (!findEmptyLocation(grid, row, col))
+        return true;
 
-    cout << "Enter password: ";
-    cin >> password;
+    // Try numbers 1 to 9
+    for (int num = 1; num <= 9; num++) {
 
-    // Validation
-    if (username.empty() || password.empty())
-    {
-        cout << "Error: Username and password cannot be empty.\n";
-        return;
-    }
+        // Check if safe to place
+        if (isSafe(grid, row, col, num)) {
 
-    if (password.length() < 6)
-    {
-        cout << "Error: Password must be at least 6 characters long.\n";
-        return;
-    }
+            grid[row][col] = num;
 
-    // Duplicate check
-    if (userExists(username))
-    {
-        cout << "Error: Username already exists.\n";
-        return;
-    }
+            // Recursive call
+            if (solveSudoku(grid))
+                return true;
 
-    // Save to file
-    ofstream file("users.txt", ios::app);
-    file << username << " " << password << endl;
-    file.close();
-
-    cout << "Registration successful!\n";
-}
-
-// Login user
-void loginUser()
-{
-    string username, password;
-    string user, pass;
-    bool found = false;
-
-    cout << "Enter username: ";
-    cin >> username;
-
-    cout << "Enter password: ";
-    cin >> password;
-
-    ifstream file("users.txt");
-
-    while (file >> user >> pass)
-    {
-        if (user == username && pass == password)
-        {
-            found = true;
-            break;
+            // Backtrack
+            grid[row][col] = 0;
         }
     }
 
-    file.close();
-
-    if (found)
-        cout << "Login successful!\n";
-    else
-        cout << "Error: Invalid username or password.\n";
+    return false;
 }
 
-// Main menu
-int main()
-{
-    int choice;
+int main() {
 
-    while (true)
-    {
-        cout << "\n===== LOGIN SYSTEM =====\n";
-        cout << "1. Register\n";
-        cout << "2. Login\n";
-        cout << "3. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    // 0 represents empty cells
+    int grid[SIZE][SIZE] = {
+        {3,0,6,5,0,8,4,0,0},
+        {5,2,0,0,0,0,0,0,0},
+        {0,8,7,0,0,0,0,3,1},
+        {0,0,3,0,1,0,0,8,0},
+        {9,0,0,8,6,3,0,0,5},
+        {0,5,0,0,9,0,6,0,0},
+        {1,3,0,0,0,0,2,5,0},
+        {0,0,0,0,0,0,0,7,4},
+        {0,0,5,2,0,6,3,0,0}
+    };
 
-        switch (choice)
-        {
-        case 1:
-            registerUser();
-            break;
+    cout << "Original Sudoku Puzzle:\n";
+    printGrid(grid);
 
-        case 2:
-            loginUser();
-            break;
-
-        case 3:
-            cout << "Exiting...\n";
-            return 0;
-
-        default:
-            cout << "Invalid choice. Try again.\n";
-        }
+    if (solveSudoku(grid)) {
+        cout << "\nSolved Sudoku Puzzle:\n";
+        printGrid(grid);
+    } else {
+        cout << "No solution exists.\n";
     }
+
+    return 0;
 }
